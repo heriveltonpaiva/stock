@@ -1,9 +1,7 @@
 package br.com.paiva.financial.stock;
 
-import br.com.paiva.financial.stock.trade.dto.OperationDTO;
 import br.com.paiva.financial.stock.trade.operation.Operation;
 import br.com.paiva.financial.stock.trade.operation.OperationRepository;
-import br.com.paiva.financial.stock.trade.operation.OperationType;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
@@ -27,8 +25,8 @@ public class StockApplication implements CommandLineRunner {
 	@Override
 	public void run(String... args) throws Exception {
 		System.out.println("Iniciando...");
-		repository.deleteAll();
 
+		/**
 		final Operation op1 = new Operation();
 		op1.setStockName("COGN3");
 		op1.setQuantity(300);
@@ -37,7 +35,7 @@ public class StockApplication implements CommandLineRunner {
 		op1.setAveragePrice(0D);
 
 		repository.save(op1);
-
+  **/
 		System.out.println("Customers found with findAll():");
 		System.out.println("-------------------------------");
 		for (Operation operation : repository.findAll()) {

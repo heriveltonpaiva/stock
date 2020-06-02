@@ -1,8 +1,9 @@
-package br.com.paiva.financial.stock.trade;
+package br.com.paiva.financial.stock.trade.tradingnote;
 
-import br.com.paiva.financial.stock.trade.dto.TradingNoteDTO;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
+
+import java.text.ParseException;
 
 @CrossOrigin("*")
 @RequiredArgsConstructor
@@ -12,7 +13,7 @@ public class TradingNoteController {
     private final TradingNoteService tradingNoteService;
 
     @RequestMapping(value = "/note", method = RequestMethod.POST)
-    public TradingNote createTradingNote(@RequestBody TradingNoteDTO tradingNote) {
+    public TradingNote createTradingNote(@RequestBody TradingNoteDTO tradingNote) throws ParseException {
         return tradingNoteService.createTradingNote(tradingNote);
     }
 

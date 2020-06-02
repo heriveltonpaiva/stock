@@ -1,10 +1,12 @@
 package br.com.paiva.financial.stock.trade;
 
-import br.com.paiva.financial.stock.trade.dto.OperationDTO;
-import br.com.paiva.financial.stock.trade.dto.TaxDTO;
-import br.com.paiva.financial.stock.trade.dto.TradingNoteDTO;
+import br.com.paiva.financial.stock.trade.operation.OperationDTO;
+import br.com.paiva.financial.stock.trade.tax.TaxDTO;
+import br.com.paiva.financial.stock.trade.tradingnote.TradingNote;
+import br.com.paiva.financial.stock.trade.tradingnote.TradingNoteDTO;
 import br.com.paiva.financial.stock.trade.operation.Operation;
 import br.com.paiva.financial.stock.trade.operation.OperationType;
+import br.com.paiva.financial.stock.trade.tradingnote.TradingNoteService;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;

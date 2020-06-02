@@ -1,13 +1,13 @@
-package br.com.paiva.financial.stock.trade;
+package br.com.paiva.financial.stock.trade.tax;
 
 import br.com.paiva.financial.stock.trade.operation.OperationType;
+import br.com.paiva.financial.stock.trade.tradingnote.TradingNote;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.springframework.data.annotation.Id;
 
-import java.math.RoundingMode;
-import java.text.DecimalFormat;
-import java.text.NumberFormat;
+import static br.com.paiva.financial.stock.util.StockUtils.getToY;
+import static br.com.paiva.financial.stock.util.StockUtils.round;
 
 @Data
 @NoArgsConstructor
@@ -36,18 +36,9 @@ public class Tax {
   }
 
   public Double getOperationalCosts(){
-    return round (brokerage + taxes + otherTaxes);
+    return round(brokerage + taxes + otherTaxes);
   }
 
-  private double getToY(final Double x, final Double toX, final Double y) {
-    return (y * toX) / x;
-  }
-
-  private Double round(final Double value){
-    NumberFormat nf = new DecimalFormat("0.000");
-    nf.setRoundingMode(RoundingMode.HALF_UP);
-    return Double.parseDouble(nf.format(value).replace(",", "."));
-  }
 
   @Override
   public String toString() {

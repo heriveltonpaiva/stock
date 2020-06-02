@@ -1,4 +1,4 @@
-package br.com.paiva.financial.stock.trade.dto;
+package br.com.paiva.financial.stock.trade.operation;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;

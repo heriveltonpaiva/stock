@@ -1,7 +1,7 @@
 package br.com.paiva.financial.stock.trade.operation;
 
-import br.com.paiva.financial.stock.trade.Tax;
-import br.com.paiva.financial.stock.trade.TradingNote;
+import br.com.paiva.financial.stock.trade.tax.Tax;
+import br.com.paiva.financial.stock.trade.tradingnote.TradingNote;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.springframework.data.annotation.Id;
@@ -19,6 +19,7 @@ public class Operation {
 
   @Id
   private String id;
+  private String tradingNoteCode;
   private String stockName;
   private Integer quantity;
   private Double unitPrice;

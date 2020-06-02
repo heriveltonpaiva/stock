@@ -1,4 +1,4 @@
-package br.com.paiva.financial.stock.trade.dto;
+package br.com.paiva.financial.stock.trade.tax;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
