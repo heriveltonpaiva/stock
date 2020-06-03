@@ -9,6 +9,7 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 public class OperationDTO {
 
+    private String tradingNoteCode;
     private String type;
     private String stockName;
     private Integer quantity;

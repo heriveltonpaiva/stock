@@ -10,6 +10,7 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 import java.util.Objects;
 
 @Component
@@ -21,12 +22,16 @@ public class TradingNoteService {
   private final TaxService taxService;
 
   public TradingNote createTradingNote(final TradingNoteDTO tradingNoteDTO) throws ParseException {
-    TradingNote noteBD = repository.findByCode(tradingNoteDTO.getCode());
-    if (Objects.isNull(noteBD)) {
+    //TradingNote noteBD = repository.findByCode(tradingNoteDTO.getCode());
+    //if (Objects.isNull(noteBD)) {
       return createNewTradingNote(tradingNoteDTO);
-    }
-    addOperationTradingNote(tradingNoteDTO, noteBD);
-    return noteBD;
+    //}
+   // addOperationTradingNote(tradingNoteDTO, noteBD);
+    //return noteBD;
+  }
+
+  public List<TradingNote> findAll(){
+    return repository.findAll();
   }
 
   private TradingNote createNewTradingNote(TradingNoteDTO tradingNoteDTO) throws ParseException {

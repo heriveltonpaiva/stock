@@ -15,6 +15,8 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import java.math.RoundingMode;
 import java.text.DecimalFormat;
 import java.text.NumberFormat;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.concurrent.atomic.AtomicReference;
@@ -28,14 +30,14 @@ public class TradeNoteServiceSellTest {
     private TradingNoteService service;
 
     @Test
-    public void validateTotalPriceList(){
+    public void validateTotalPriceList() throws ParseException {
         TradingNoteDTO input = getTradingNoteDTO();
         TradingNote note = service.createTradingNote(input);
         assertEquals(note.getValue(), input.getValue());
     }
 
     @Test
-    public void validateCalculateDarf(){
+    public void validateCalculateDarf() throws ParseException {
         TradingNoteDTO input = getTradingNoteDTO();
         TradingNote note = service.createTradingNote(input);
 
@@ -53,7 +55,7 @@ public class TradeNoteServiceSellTest {
     }
 
     @Test
-    public void validatePurchasePriceList(){
+    public void validatePurchasePriceList() throws ParseException {
         TradingNoteDTO input = getTradingNoteDTO();
         TradingNote note = service.createTradingNote(input);
 
@@ -67,7 +69,7 @@ public class TradeNoteServiceSellTest {
     }
 
     @Test
-    public void validateTotalTaxPriceList(){
+    public void validateTotalTaxPriceList() throws ParseException {
         TradingNoteDTO input = getTradingNoteDTO();
         TradingNote note = service.createTradingNote(input);
 
@@ -126,9 +128,10 @@ public class TradeNoteServiceSellTest {
     op3.setQuantity(200);
     op3.setOperationPrice(1416.0);
     op3.setType(OperationType.BUY.name());
-
+    String pattern = "yyyy-MM-dd";
+    SimpleDateFormat simpleDateFormat = new SimpleDateFormat(pattern);
     return TradingNoteDTO.builder()
-                .date(new Date())
+                .date(simpleDateFormat.format(new Date()))
                 .stocks(Arrays.asList(op1, op2, op3))
                 .taxes(tax)
                 .operationSell(4875.0)

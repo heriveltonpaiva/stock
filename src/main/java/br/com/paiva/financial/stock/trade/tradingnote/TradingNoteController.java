@@ -4,6 +4,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 
 import java.text.ParseException;
+import java.util.List;
 
 @CrossOrigin("*")
 @RequiredArgsConstructor
@@ -15,6 +16,11 @@ public class TradingNoteController {
     @RequestMapping(value = "/note", method = RequestMethod.POST)
     public TradingNote createTradingNote(@RequestBody TradingNoteDTO tradingNote) throws ParseException {
         return tradingNoteService.createTradingNote(tradingNote);
+    }
+
+    @GetMapping(value = "/notes")
+    public List<TradingNote> findAll() {
+        return tradingNoteService.findAll();
     }
 
 }
