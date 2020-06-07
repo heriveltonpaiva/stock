@@ -1,13 +1,16 @@
 package br.com.paiva.financial.stock.trade.operation;
 
+import br.com.paiva.financial.stock.dashboard.stockposition.StockPosition;
 import br.com.paiva.financial.stock.dashboard.stockposition.StockPositionService;
 import br.com.paiva.financial.stock.dashboard.totaloperation.TotalOperationService;
 import br.com.paiva.financial.stock.trade.tax.TaxService;
+import br.com.paiva.financial.stock.trade.tradingnote.BrokerType;
 import br.com.paiva.financial.stock.trade.tradingnote.TradingNote;
-import br.com.paiva.financial.stock.trade.tradingnote.TradingNoteRepository;
+import br.com.paiva.financial.stock.trade.tradingnote.TradingNoteService;
 import br.com.paiva.financial.stock.util.StockUtils;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Component;
 
 import java.math.BigDecimal;
@@ -27,7 +30,7 @@ public class OperationService {
 
   private final TaxService taxService;
 
-  private final TradingNoteRepository tradingNoteRepository;
+  private final TradingNoteService tradingNoteService;
 
   private final StockPositionService stockPositionService;
 
@@ -38,42 +41,7 @@ public class OperationService {
   }
 
   public List<Operation> findAll() {
-    return repository.findAll();
-  }
-
-  public Operation createOperation(final OperationDTO dto, final TradingNote note) {
-    Operation op = new Operation();
-
-    if (dto.getPurchasePrice() == null) {
-      op.setPurchasePrice(0D);
-    }
-
-    op.setTradingNoteCode(note.getCode());
-    op.setType(OperationType.valueOf(dto.getType()));
-    op.setStockName(dto.getStockName());
-    op.setOperationPrice(dto.getOperationPrice());
-    op.setQuantity(dto.getQuantity());
-    op.setUnitPrice(op.getOperationPrice() / op.getQuantity());
-
-    op.setTaxes(taxService.createOperationTax(note, dto.getOperationPrice(), op.getType()));
-    op.setPurchasePrice(
-        OperationType.valueOf(dto.getType()) == OperationType.BUY
-            ? op.getOperationPrice() + op.getTaxes().getTotalValue()
-            : dto.getPurchasePrice());
-    op.setAveragePrice(
-        OperationType.valueOf(dto.getType()) == OperationType.BUY
-            ? op.getOperationPrice() / op.getQuantity()
-            : dto.getPurchasePrice() / op.getQuantity());
-    op.setGainValue(getGainValue(op));
-    op.setDarf(getDarf(op));
-    save(op);
-
-    LocalDate noteDate = note.getDate().toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
-    stockPositionService.createOrUpdate(op, noteDate);
-    List<Operation> operations = findByStockName(op.getStockName());
-    totalOperationService.createOrUpdate(op, noteDate, operations);
-
-    return op;
+    return repository.findAll(Sort.by(Sort.Order.asc("tradingNoteCode")));
   }
 
   private Double getDarf(final Operation op) {
@@ -99,41 +67,75 @@ public class OperationService {
   }
 
   public Operation create(OperationDTO dto) {
-    Operation op = new Operation();
-    TradingNote note = tradingNoteRepository.findByCode(dto.getTradingNoteCode());
+    TradingNote note = tradingNoteService.findByCode(dto.getTradingNoteCode());
 
     if (Objects.nonNull(note)) {
-      if (Objects.isNull(dto.getPurchasePrice())) {
-        op.setPurchasePrice(0D);
-      }
-
+      log.info("TradingNote code={} was found", note.getCode());
+      Operation op = new Operation();
       op.setTradingNoteCode(note.getCode());
       op.setType(OperationType.valueOf(dto.getType()));
       op.setStockName(dto.getStockName());
       op.setOperationPrice(dto.getOperationPrice());
       op.setQuantity(dto.getQuantity());
       op.setUnitPrice(op.getOperationPrice() / op.getQuantity());
+      op.setTaxes(taxService.calculateTaxes(note, dto.getOperationPrice(), op.getType()));
 
-      op.setTaxes(taxService.createOperationTax(note, dto.getOperationPrice(), op.getType()));
-      op.setPurchasePrice(
-          OperationType.valueOf(dto.getType()) == OperationType.BUY
-              ? op.getOperationPrice() + op.getTaxes().getTotalValue()
-              : dto.getPurchasePrice());
-      op.setAveragePrice(
-          OperationType.valueOf(dto.getType()) == OperationType.BUY
-              ? op.getOperationPrice() / op.getQuantity()
-              : dto.getPurchasePrice() / op.getQuantity());
-      op.setGainValue(getGainValue(op));
-      op.setDarf(getDarf(op));
+      log.info("Taxes created totalTaxes={}"+op.getTaxes().getTotalValue());
+      op.getTaxes().setBrokerage(note.getBroker().equals(BrokerType.XP) ? 18.9 : 0D);
+
+      calculateOperationValues(op);
+
       save(op);
-      LocalDate noteDate = note.getDate().toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
-      stockPositionService.createOrUpdate(op, noteDate);
-      List<Operation> operations = findByStockName(op.getStockName());
-      totalOperationService.createOrUpdate(op, noteDate, operations);
+      log.info("Operation was created successfully. operation={}", op);
+
+      reprocessTotalOperation();
+      updateStockPosition(op);
 
       return op;
     }
     log.error("Trading note i'snt exist!");
     return null;
+  }
+
+  private void calculateOperationValues(final Operation op){
+    if(op.getType() == OperationType.SELL){
+      List<StockPosition> stockPositions = stockPositionService.findByStockName(op.getStockName());
+      StockPosition stockPosition = stockPositions.stream().findFirst().get();
+      log.info("Stock position was found stockPosition={}",stockPosition);
+      log.info("{} Stock position purchasePrice={}", op.getStockName(), stockPosition.getTotalPurchased());
+
+      op.setPurchasePrice(StockUtils.getToY(stockPosition.getQuantity(), stockPosition.getTotalPurchased(), op.getQuantity()));
+      op.setAveragePrice(op.getPurchasePrice() / op.getQuantity());
+      op.setGainValue(getGainValue(op));
+      op.setDarf(getDarf(op));
+      log.info("SELL Operation gainValue={} DARF={}", op.getGainValue(), op.getDarf());
+    } else {
+      op.setPurchasePrice(op.getOperationPrice() + op.getTaxes().getTotalValue());
+      op.setAveragePrice(op.getPurchasePrice() / op.getQuantity());
+    }
+    log.info("PurchasePrice calculated (operationPrice + totalTaxes)={}"+op.getPurchasePrice());
+    log.info("AveragePrice calculated (purchasePrice / quantity)={}"+op.getAveragePrice());
+  }
+
+  public void reprocessTotalOperation(){
+    List<Operation> operations = findAll();
+    operations.forEach(op ->{
+      TradingNote note = tradingNoteService.findByCode(op.getTradingNoteCode());
+       LocalDate noteDate = note.getDate().toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
+        totalOperationService.createOrUpdate(noteDate, op);
+    });
+  }
+
+  public void reprocessStockPosition(){
+    List<Operation> operations = findAll();
+    operations.forEach(op ->{
+      updateStockPosition(op);
+    });
+  }
+
+  public void updateStockPosition(final Operation op){
+    TradingNote note = tradingNoteService.findByCode(op.getTradingNoteCode());
+    LocalDate noteDate = note.getDate().toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
+    stockPositionService.createOrUpdate(op, noteDate);
   }
 }

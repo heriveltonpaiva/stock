@@ -1,13 +1,13 @@
 package br.com.paiva.financial.stock.dashboard.stockposition;
 
+import lombok.AllArgsConstructor;
 import lombok.Data;
-import lombok.NoArgsConstructor;
 import org.springframework.data.annotation.Id;
 
 import java.time.LocalDate;
 
 @Data
-@NoArgsConstructor
+@AllArgsConstructor
 public class StockPosition {
     @Id
     private String id;
@@ -17,4 +17,10 @@ public class StockPosition {
     private Double averagePrice;
     private Double totalPurchased;
     private LocalDate lastModified;
+
+    public StockPosition(){
+        this.quantity = 0;
+        this.averagePrice = 0D;
+        this.totalPurchased = 0D;
+    }
 }

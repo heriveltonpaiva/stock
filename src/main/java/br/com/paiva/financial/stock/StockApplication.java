@@ -1,47 +1,46 @@
 package br.com.paiva.financial.stock;
 
+import br.com.paiva.financial.stock.dashboard.stockposition.StockPosition;
+import br.com.paiva.financial.stock.dashboard.stockposition.StockPositionRepository;
+import br.com.paiva.financial.stock.dashboard.stockposition.StockPositionService;
+import br.com.paiva.financial.stock.dashboard.totaloperation.TotalOperation;
+import br.com.paiva.financial.stock.dashboard.totaloperation.TotalOperationRepository;
 import br.com.paiva.financial.stock.trade.operation.Operation;
 import br.com.paiva.financial.stock.trade.operation.OperationRepository;
+import br.com.paiva.financial.stock.trade.operation.OperationService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
+import java.util.List;
+
 @Slf4j
 @SpringBootApplication
 public class StockApplication implements CommandLineRunner {
 
-	@Autowired
-	private OperationRepository repository;
+  @Autowired private OperationRepository repository;
 
-	public static void main(String[] args) {
+  @Autowired private OperationService operationService;
+  @Autowired private TotalOperationRepository totalOperationRepository;
+  @Autowired private StockPositionRepository stockPositionRepository;
+  @Autowired private StockPositionService stockPositionService;
+  public static void main(String[] args) {
 
-		SpringApplication.run(StockApplication.class, args);
+    SpringApplication.run(StockApplication.class, args);
+  }
 
-	}
+  @Override
+  public void run(String... args) throws Exception {
 
-
-	@Override
-	public void run(String... args) throws Exception {
-		System.out.println("Iniciando...");
-
-		/**
-		final Operation op1 = new Operation();
-		op1.setStockName("COGN3");
-		op1.setQuantity(300);
-		op1.setOperationPrice(1446.0);
-		op1.setType(OperationType.BUY);
-		op1.setAveragePrice(0D);
-
-		repository.save(op1);
-  **/
-		System.out.println("Customers found with findAll():");
-		System.out.println("-------------------------------");
-		for (Operation operation : repository.findAll()) {
-			System.out.println(operation);
-		}
-
-	}
-
+    stockPositionRepository.deleteAll();
+    operationService.reprocessStockPosition();
+    totalOperationRepository.deleteAll();
+    operationService.reprocessTotalOperation();
+    List<TotalOperation> totalOperations = totalOperationRepository.findAll();
+    for (TotalOperation operation : totalOperations) {
+      System.out.println(operation);
+    }
+  }
 }

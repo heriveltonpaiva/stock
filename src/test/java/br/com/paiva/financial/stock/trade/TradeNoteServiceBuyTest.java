@@ -2,15 +2,21 @@ package br.com.paiva.financial.stock.trade;
 
 import br.com.paiva.financial.stock.trade.operation.Operation;
 import br.com.paiva.financial.stock.trade.operation.OperationDTO;
+import br.com.paiva.financial.stock.trade.operation.OperationService;
 import br.com.paiva.financial.stock.trade.operation.OperationType;
+import br.com.paiva.financial.stock.trade.tax.Tax;
 import br.com.paiva.financial.stock.trade.tax.TaxDTO;
+import br.com.paiva.financial.stock.trade.tax.TaxService;
 import br.com.paiva.financial.stock.trade.tradingnote.TradingNote;
 import br.com.paiva.financial.stock.trade.tradingnote.TradingNoteDTO;
+import br.com.paiva.financial.stock.trade.tradingnote.TradingNoteRepository;
 import br.com.paiva.financial.stock.trade.tradingnote.TradingNoteService;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
+import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.data.mongodb.core.mapping.MongoId;
 
 import java.math.RoundingMode;
 import java.text.DecimalFormat;
@@ -22,11 +28,16 @@ import java.util.Date;
 import java.util.concurrent.atomic.AtomicReference;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
 public class TradeNoteServiceBuyTest {
 
   @InjectMocks private TradingNoteService service;
+  @Mock private TaxService taxService;
+  @Mock private TradingNoteRepository repository;
+
+  @Mock private OperationService operationService;
 
   @Test
   public void validateTotalPriceList() throws ParseException {
@@ -41,6 +52,9 @@ public class TradeNoteServiceBuyTest {
     TradingNote note = service.createTradingNote(input);
 
     Operation op = note.getOperationList().get(0);
+    TradingNote td = new TradingNote();
+    when(taxService.calculateTaxes(td, op.getOperationPrice(), OperationType.BUY))
+        .thenReturn(tax());
     Double purchase = op.getTaxes().getTotalValue() + op.getOperationPrice();
     Double average = op.getPurchasePrice() / op.getQuantity();
     Double unitPrice = op.getOperationPrice() / op.getQuantity();
@@ -89,17 +103,29 @@ public class TradeNoteServiceBuyTest {
     assertEquals(note.getTaxes().getOperationalCosts(), operationalCosts);
   }
 
-  private TradingNoteDTO getTradingNoteDTO() {
+  private TaxDTO taxDTO() {
+    return TaxDTO.builder()
+        .liquidation(1.49)
+        .brokerage(56.70)
+        .emoluments(0.16)
+        .taxes(6.05)
+        .incomingTax(0D)
+        .otherTaxes(2.21)
+        .build();
+  }
 
-    final TaxDTO tax =
-        TaxDTO.builder()
-            .liquidation(1.49)
-            .brokerage(56.70)
-            .emoluments(0.16)
-            .taxes(6.05)
-            .incomingTax(0D)
-            .otherTaxes(2.21)
-            .build();
+  private Tax tax() {
+    return Tax.builder()
+        .liquidation(1.49)
+        .brokerage(56.70)
+        .emoluments(0.16)
+        .taxes(6.05)
+        .incomingTax(0D)
+        .otherTaxes(2.21)
+        .build();
+  }
+
+  private TradingNoteDTO getTradingNoteDTO() {
 
     final OperationDTO op1 = new OperationDTO();
     op1.setStockName("COGN3");
@@ -121,9 +147,10 @@ public class TradeNoteServiceBuyTest {
     String pattern = "yyyy-MM-dd";
     SimpleDateFormat simpleDateFormat = new SimpleDateFormat(pattern);
     return TradingNoteDTO.builder()
+        .broker("XP")
         .date(simpleDateFormat.format(new Date()))
         .stocks(Arrays.asList(op1, op2, op3))
-        .taxes(tax)
+        .taxes(taxDTO())
         .value(5439.0)
         .build();
   }

@@ -5,11 +5,13 @@ import br.com.paiva.financial.stock.trade.tradingnote.TradingNote;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.springframework.data.annotation.Id;
+import org.springframework.data.annotation.Transient;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.text.DecimalFormat;
 import java.text.NumberFormat;
+import java.util.Objects;
 
 @Data
 @NoArgsConstructor
@@ -31,34 +33,20 @@ public class Operation {
   private OperationType type;
   private Double darf;
 
-  public Operation(
-      final OperationType type,
-      final String stockName,
-      final Double operationPrice,
-      final Integer quantity,
-      final Double purchasePrice,
-      final TradingNote tradingNote) {
-    this.type = type;
-    this.stockName = stockName;
-    this.operationPrice = operationPrice;
-    this.quantity = quantity;
-    this.taxes = new Tax(tradingNote, operationPrice, type);
-    this.unitPrice = operationPrice / quantity;
-    this.purchasePrice = (type == OperationType.BUY) ?  operationPrice + taxes.getTotalValue() : purchasePrice;
-    this.gainValue = 0D;
-    this.averagePrice = type == OperationType.BUY ? this.purchasePrice/quantity : purchasePrice/quantity;
-  }
-
   public Double getDarf(){
     if(type.equals(OperationType.SELL)){
-      return getGainValue() * SWING_TRADE_TAX;
+      return round(getGainValue() * SWING_TRADE_TAX);
     }
     return 0D;
   }
 
+  public Double getPurchasePrice() {
+    return Objects.isNull(purchasePrice) ? 0 : purchasePrice;
+  }
+
   public Double getGainValue(){
     if(type.equals(OperationType.SELL)){
-      return round(this.operationPrice - this.purchasePrice - this.taxes.getTotalValue() - this.getTaxes().getIncomingTax());
+      return round(this.operationPrice - this.purchasePrice - this.taxes.getTotalValue());
     }
     return BigDecimal.ZERO.doubleValue();
   }

@@ -1,6 +1,7 @@
 package br.com.paiva.financial.stock.trade.tax;
 
 import br.com.paiva.financial.stock.trade.operation.OperationType;
+import br.com.paiva.financial.stock.trade.tradingnote.BrokerType;
 import br.com.paiva.financial.stock.trade.tradingnote.TradingNote;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
@@ -27,17 +28,15 @@ public class TaxService {
     return dtoToEntity(dto);
   }
 
-  public Tax createOperationTax(final TradingNote dto, final Double operationValue, final OperationType type){
-     Tax newTax = new Tax();
-    newTax.setEmoluments(round(getToY(dto.getValue(), dto.getTaxes().getEmoluments(), operationValue)));
-    newTax.setLiquidation(round(getToY(dto.getValue(), dto.getTaxes().getLiquidation(), operationValue)));
-    newTax.setTaxes(round(getToY(dto.getValue(), dto.getTaxes().getTaxes(), operationValue)));
-    newTax.setIncomingTax(type == OperationType.SELL ? round(getToY(dto.getValueSell(), dto.getTaxes().getIncomingTax(), operationValue)) : 0D);
-    newTax.setOtherTaxes(round(getToY(dto.getValue(), dto.getTaxes().getOtherTaxes(), operationValue)));
-
-    return newTax;
+  public Tax calculateTaxes(final TradingNote note, final Double operationValue, final OperationType type){
+    Tax tax = new Tax();
+    tax.setEmoluments(round(getToY(note.getValue(), note.getTaxes().getEmoluments(), operationValue)));
+    tax.setLiquidation(round(getToY(note.getValue(), note.getTaxes().getLiquidation(), operationValue)));
+    tax.setTaxes(round(getToY(note.getValue(), note.getTaxes().getTaxes(), operationValue)));
+    tax.setIncomingTax(type == OperationType.SELL ? round(getToY(note.getValueSell(), note.getTaxes().getIncomingTax(), operationValue)) : 0D);
+    tax.setOtherTaxes(round(getToY(note.getValue(), note.getTaxes().getOtherTaxes(), operationValue)));
+    tax.setBrokerage(note.getBroker().equals(BrokerType.XP)? 18.9 : 0);
+    return tax;
   }
-
-
 
 }

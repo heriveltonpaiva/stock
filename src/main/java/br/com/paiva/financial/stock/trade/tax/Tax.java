@@ -2,6 +2,8 @@ package br.com.paiva.financial.stock.trade.tax;
 
 import br.com.paiva.financial.stock.trade.operation.OperationType;
 import br.com.paiva.financial.stock.trade.tradingnote.TradingNote;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.springframework.data.annotation.Id;
@@ -9,14 +11,16 @@ import org.springframework.data.annotation.Id;
 import static br.com.paiva.financial.stock.util.StockUtils.getToY;
 import static br.com.paiva.financial.stock.util.StockUtils.round;
 
+@Builder
 @Data
 @NoArgsConstructor
+@AllArgsConstructor
 public class Tax {
   @Id
   private String id;
   private Double emoluments;
   private Double liquidation;
-  private Double brokerage = 18.90;
+  private Double brokerage;
   private Double taxes;
   private Double incomingTax;
   private Double otherTaxes;
@@ -32,7 +36,7 @@ public class Tax {
   }
 
   public Double getTotalValue(){
-    return round(emoluments + liquidation + brokerage + taxes + otherTaxes);
+    return round(emoluments + liquidation + brokerage + taxes + otherTaxes + incomingTax);
   }
 
   public Double getOperationalCosts(){

@@ -9,5 +9,5 @@ public interface StockPositionRepository extends MongoRepository<StockPosition, 
 
     StockPosition findByDateAndStockName(final LocalDate date, final String stockName);
 
-    List<StockPosition> findByStockName(final String stockName);
+    List<StockPosition> findByStockNameOrderByDateDesc(final String stockName);
 }

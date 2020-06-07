@@ -11,27 +11,24 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
-import java.util.Objects;
 
 @Component
 @RequiredArgsConstructor
 public class TradingNoteService {
 
   private final TradingNoteRepository repository;
-  private final OperationService operationService;
   private final TaxService taxService;
 
   public TradingNote createTradingNote(final TradingNoteDTO tradingNoteDTO) throws ParseException {
-    //TradingNote noteBD = repository.findByCode(tradingNoteDTO.getCode());
-    //if (Objects.isNull(noteBD)) {
       return createNewTradingNote(tradingNoteDTO);
-    //}
-   // addOperationTradingNote(tradingNoteDTO, noteBD);
-    //return noteBD;
   }
 
   public List<TradingNote> findAll(){
     return repository.findAll();
+  }
+
+  public TradingNote findByCode(final String code){
+    return repository.findByCode(code);
   }
 
   private TradingNote createNewTradingNote(TradingNoteDTO tradingNoteDTO) throws ParseException {
@@ -46,7 +43,7 @@ public class TradingNoteService {
     note.setDate(date);
     note.setValueSell(tradingNoteDTO.getOperationSell());
     TradingNote noteSaved = repository.save(note);
-    addOperationTradingNote(tradingNoteDTO, noteSaved);
+    //addOperationTradingNote(tradingNoteDTO, noteSaved);
     return note;
   }
 
@@ -55,9 +52,10 @@ public class TradingNoteService {
         .getStocks()
         .forEach(
             stock -> {
-              Operation op = operationService.createOperation(stock, noteSaved);
+              stock.setTradingNoteCode(noteSaved.getCode());
+             // Operation op = operationService.create(stock);
               noteSaved.setOperationList(new ArrayList<>());
-              noteSaved.getOperationList().add(op);
+             // noteSaved.getOperationList().add(op);
             });
   }
 }

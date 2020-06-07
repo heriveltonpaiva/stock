@@ -13,6 +13,9 @@ public class StockUtils {
   }
 
   public static double getToY(final Double x, final Double toX, final Double y) {
-    return (y * toX) / x;
+    return (y== 0 || toX == 0D)? 0D : (y * toX) / x;
+  }
+  public static double getToY(final Integer x, final Double toX, final Integer y) {
+    return (y== 0 || toX == 0D)? 0D : (y * toX) / x;
   }
 }
