@@ -1,11 +1,9 @@
 package br.com.paiva.financial.stock.trade.operation;
 
 import br.com.paiva.financial.stock.trade.tax.Tax;
-import br.com.paiva.financial.stock.trade.tradingnote.TradingNote;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.springframework.data.annotation.Id;
-import org.springframework.data.annotation.Transient;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
@@ -35,6 +33,9 @@ public class Operation {
 
   public Double getDarf(){
     if(type.equals(OperationType.SELL)){
+      if(getGainValue() < 0D){
+        return 0D;
+      }
       return round(getGainValue() * SWING_TRADE_TAX);
     }
     return 0D;

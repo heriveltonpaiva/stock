@@ -40,7 +40,7 @@ public class StockApplication implements CommandLineRunner {
     operationService.reprocessTotalOperation();
     List<TotalOperation> totalOperations = totalOperationRepository.findAll();
     for (TotalOperation operation : totalOperations) {
-      System.out.println(operation);
+      //System.out.println(operation);
     }
   }
 }

@@ -13,7 +13,7 @@ public class OperationController {
   private final OperationService service;
 
   @RequestMapping(value = "/operation", method = RequestMethod.POST)
-  public Operation createOperation(@RequestBody OperationDTO dto){
+  public Operation createOperation(@RequestBody OperationDTO dto) {
     return service.create(dto);
   }
   @RequestMapping(value = "/operations", method = RequestMethod.GET)

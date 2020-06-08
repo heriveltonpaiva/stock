@@ -66,7 +66,7 @@ public class OperationService {
     return repository.save(operation);
   }
 
-  public Operation create(OperationDTO dto) {
+  public Operation create(OperationDTO dto){
     TradingNote note = tradingNoteService.findByCode(dto.getTradingNoteCode());
 
     if (Objects.nonNull(note)) {
@@ -83,12 +83,12 @@ public class OperationService {
       log.info("Taxes created totalTaxes={}"+op.getTaxes().getTotalValue());
       op.getTaxes().setBrokerage(note.getBroker().equals(BrokerType.XP) ? 18.9 : 0D);
 
-      calculateOperationValues(op);
+      calculateOperationValues(op, note.getBroker());
 
       save(op);
       log.info("Operation was created successfully. operation={}", op);
 
-      reprocessTotalOperation();
+      updateTotalOperation(op);
       updateStockPosition(op);
 
       return op;
@@ -97,14 +97,14 @@ public class OperationService {
     return null;
   }
 
-  private void calculateOperationValues(final Operation op){
+  private void calculateOperationValues(final Operation op, final BrokerType brokerType){
     if(op.getType() == OperationType.SELL){
       List<StockPosition> stockPositions = stockPositionService.findByStockName(op.getStockName());
-      StockPosition stockPosition = stockPositions.stream().findFirst().get();
-      log.info("Stock position was found stockPosition={}",stockPosition);
-      log.info("{} Stock position purchasePrice={}", op.getStockName(), stockPosition.getTotalPurchased());
+      StockPosition lastStockPosition = stockPositions.stream().filter(s -> s.getBroker().equals(brokerType)).findFirst().get();
+      log.info("Stock position was found stockPosition={}",lastStockPosition);
+      log.info("{} Stock position purchasePrice={}", op.getStockName(), lastStockPosition.getTotalPurchased());
 
-      op.setPurchasePrice(StockUtils.getToY(stockPosition.getQuantity(), stockPosition.getTotalPurchased(), op.getQuantity()));
+      op.setPurchasePrice(StockUtils.getToY(lastStockPosition.getQuantity(), lastStockPosition.getTotalPurchased(), op.getQuantity()));
       op.setAveragePrice(op.getPurchasePrice() / op.getQuantity());
       op.setGainValue(getGainValue(op));
       op.setDarf(getDarf(op));
@@ -120,22 +120,26 @@ public class OperationService {
   public void reprocessTotalOperation(){
     List<Operation> operations = findAll();
     operations.forEach(op ->{
-      TradingNote note = tradingNoteService.findByCode(op.getTradingNoteCode());
-       LocalDate noteDate = note.getDate().toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
-        totalOperationService.createOrUpdate(noteDate, op);
+      updateTotalOperation(op);
     });
+  }
+
+  private void updateTotalOperation(Operation op) {
+    TradingNote note = tradingNoteService.findByCode(op.getTradingNoteCode());
+    LocalDate noteDate = note.getDate().toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
+    totalOperationService.createOrUpdate(noteDate, op);
   }
 
   public void reprocessStockPosition(){
     List<Operation> operations = findAll();
     operations.forEach(op ->{
-      updateStockPosition(op);
+        updateStockPosition(op);
     });
   }
 
   public void updateStockPosition(final Operation op){
     TradingNote note = tradingNoteService.findByCode(op.getTradingNoteCode());
     LocalDate noteDate = note.getDate().toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
-    stockPositionService.createOrUpdate(op, noteDate);
+    stockPositionService.createOrUpdate(op, noteDate, note.getBroker());
   }
 }
