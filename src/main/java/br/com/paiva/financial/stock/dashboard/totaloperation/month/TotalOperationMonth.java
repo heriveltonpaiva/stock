@@ -1,23 +1,24 @@
-package br.com.paiva.financial.stock.dashboard.totaloperation;
+package br.com.paiva.financial.stock.dashboard.totaloperation.month;
 
-import br.com.paiva.financial.stock.trade.operation.Operation;
+import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
+import lombok.NoArgsConstructor;
 import org.springframework.data.annotation.Id;
 
 import java.time.LocalDate;
-import java.util.List;
 import java.util.Objects;
 
 @Data
+@AllArgsConstructor
 @EqualsAndHashCode
-public class TotalOperation {
+public class TotalOperationMonth {
 
   @Id private String id;
-  private Integer referenceMonth;
-  private String stockName;
   private Integer buyQuantity;
   private Integer sellQuantity;
+  private Integer referenceYear;
+  private Integer referenceMonth;
   private Double totalPurchased;
   private Double totalSold;
   private Double totalEmoluments;
@@ -29,9 +30,8 @@ public class TotalOperation {
   private Double totalGainValue;
   private Double totalDarf;
   private LocalDate lastModified;
-  private List<Operation> operationList;
 
-  public TotalOperation(){
+  public TotalOperationMonth(){
     this.buyQuantity = 0;
     this.sellQuantity = 0;
     this.totalPurchased = 0D;
@@ -47,8 +47,8 @@ public class TotalOperation {
     this.lastModified = LocalDate.now();
   }
 
-  public Double getTotalPurchased(){
-      return Objects.isNull(totalPurchased) ? 0 : totalPurchased;
+  public Double getTotalPurchased() {
+    return Objects.isNull(totalPurchased) ? 0 : totalPurchased;
   }
 
   public Integer getBuyQuantity() {
@@ -64,11 +64,10 @@ public class TotalOperation {
   }
 
   public Double getTotalGainValue() {
-    return  Objects.isNull(totalGainValue) ? 0D : totalGainValue;
+    return Objects.isNull(totalGainValue) ? 0D : totalGainValue;
   }
 
   public Double getTotalDarf() {
     return Objects.isNull(totalDarf) ? 0D : totalDarf;
   }
-
 }

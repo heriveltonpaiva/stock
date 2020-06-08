@@ -122,6 +122,8 @@ public class OperationService {
     operations.forEach(op ->{
       updateTotalOperation(op);
     });
+    totalOperationService.reprocessTotalOperationMonth(totalOperationService.findAll());
+    totalOperationService.reprocessTotalOperationYear(2020, totalOperationService.findAllMonth());
   }
 
   private void updateTotalOperation(Operation op) {
