@@ -22,6 +22,7 @@ public class TotalOperation {
   private Double totalSold;
   private Double totalEmoluments;
   private Double totalLiquidation;
+  private Double totalBrokerage;
   private Double totalTaxes;
   private Double totalIncomingTax;
   private Double totalOtherTaxes;
@@ -38,6 +39,7 @@ public class TotalOperation {
     this.totalSold = 0D;
     this.totalEmoluments = 0D;
     this.totalLiquidation = 0D;
+    this.totalBrokerage = 0D;
     this.totalOtherTaxes = 0D;
     this.totalOperationalCosts = 0D;
     this.totalGainValue = 0D;

@@ -32,6 +32,10 @@ public class TotalOperationService {
     return monthRepository.findAll(Sort.by(Sort.Order.asc("referenceMonth")));
   }
 
+  public List<TotalOperationYear> findAllYear() {
+    return yearRepository.findAll(Sort.by(Sort.Order.asc("referenceMonth")));
+  }
+
   public Set<TotalOperationMonth> reprocessTotalOperationMonth(
       final List<TotalOperation> totalOperations) {
     Map<Integer, List<TotalOperation>> map = new HashMap<>();
@@ -68,14 +72,25 @@ public class TotalOperationService {
               total.setTotalOtherTaxes(total.getTotalOtherTaxes() + it.getTotalOtherTaxes());
               total.setTotalSold(total.getTotalSold() + it.getTotalSold());
               total.setTotalPurchased(total.getTotalPurchased() + it.getTotalPurchased());
+              total.setTotalBrokerage(total.getTotalBrokerage() + it.getTotalBrokerage());
             });
+
+    total.setTotalOperationalCosts(
+        total.getTotalTaxes()
+            + total.getTotalBrokerage()
+            + total.getTotalOtherTaxes()
+            + total.getTotalDarf()
+            + total.getTotalIncomingTax());
+    total.setTotalTaxes(
+        total.getTotalLiquidation()
+            + total.getTotalEmoluments()
+            + total.getTotalOperationalCosts());
 
     return monthRepository.save(total);
   }
 
   public TotalOperationYear reprocessTotalOperationYear(
       final Integer year, final List<TotalOperationMonth> totalOperations) {
-    List<TotalOperationYear> totalOperationYear = new ArrayList<>();
     TotalOperationYear total = new TotalOperationYear();
     total.setReferenceYear(year);
     totalOperations.stream()
@@ -90,9 +105,19 @@ public class TotalOperationService {
               total.setTotalIncomingTax(total.getTotalIncomingTax() + it.getTotalIncomingTax());
               total.setTotalOtherTaxes(total.getTotalOtherTaxes() + it.getTotalOtherTaxes());
               total.setTotalSold(total.getTotalSold() + it.getTotalSold());
+              total.setTotalBrokerage(total.getTotalBrokerage() + it.getTotalBrokerage());
               total.setTotalPurchased(total.getTotalPurchased() + it.getTotalPurchased());
             });
-
+    total.setTotalOperationalCosts(
+        total.getTotalTaxes()
+            + total.getTotalBrokerage()
+            + total.getTotalOtherTaxes()
+            + total.getTotalDarf()
+            + total.getTotalIncomingTax());
+    total.setTotalTaxes(
+        total.getTotalLiquidation()
+            + total.getTotalEmoluments()
+            + total.getTotalOperationalCosts());
     return yearRepository.save(total);
   }
 
@@ -129,6 +154,7 @@ public class TotalOperationService {
           totalOperationBD.getTotalIncomingTax() + operation.getTaxes().getIncomingTax());
       Double totalDarf = totalOperationBD.getTotalDarf() + operation.getDarf();
       totalOperationBD.setTotalDarf(totalDarf < 0D ? 0D : totalDarf);
+      totalOperationBD.setTotalBrokerage(totalOperationBD.getTotalBrokerage() + operation.getTaxes().getBrokerage());
       totalOperationBD.setTotalOtherTaxes(
           totalOperationBD.getTotalOtherTaxes() + operation.getTaxes().getOtherTaxes());
       totalOperationBD.setTotalTaxes(
@@ -157,6 +183,7 @@ public class TotalOperationService {
     totalOperation.setTotalLiquidation(operation.getTaxes().getLiquidation());
     totalOperation.setTotalIncomingTax(operation.getTaxes().getIncomingTax());
     totalOperation.setTotalDarf(operation.getDarf());
+    totalOperation.setTotalBrokerage(operation.getTaxes().getBrokerage());
     totalOperation.setTotalOtherTaxes(operation.getTaxes().getOtherTaxes());
     totalOperation.setTotalTaxes(operation.getTaxes().getTaxes());
     totalOperation.setTotalOperationalCosts(operation.getTaxes().getOperationalCosts());

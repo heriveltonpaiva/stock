@@ -23,4 +23,9 @@ public class TradingNoteController {
         return tradingNoteService.findAll();
     }
 
+    @GetMapping(value = "/note/{code}")
+    public TradingNote findByCode(@PathVariable final String code) {
+        return tradingNoteService.findByCode(code);
+    }
+
 }

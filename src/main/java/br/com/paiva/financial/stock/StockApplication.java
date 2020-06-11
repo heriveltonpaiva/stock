@@ -5,6 +5,8 @@ import br.com.paiva.financial.stock.dashboard.stockposition.StockPositionReposit
 import br.com.paiva.financial.stock.dashboard.stockposition.StockPositionService;
 import br.com.paiva.financial.stock.dashboard.totaloperation.TotalOperation;
 import br.com.paiva.financial.stock.dashboard.totaloperation.TotalOperationRepository;
+import br.com.paiva.financial.stock.dashboard.totaloperation.month.TotalOperationMonthRepository;
+import br.com.paiva.financial.stock.dashboard.totaloperation.year.TotalOperationYearRepository;
 import br.com.paiva.financial.stock.trade.operation.Operation;
 import br.com.paiva.financial.stock.trade.operation.OperationRepository;
 import br.com.paiva.financial.stock.trade.operation.OperationService;
@@ -24,6 +26,8 @@ public class StockApplication implements CommandLineRunner {
 
   @Autowired private OperationService operationService;
   @Autowired private TotalOperationRepository totalOperationRepository;
+  @Autowired private TotalOperationMonthRepository totalOperationMonthRepository;
+  @Autowired private TotalOperationYearRepository totalOperationYearRepository;
   @Autowired private StockPositionRepository stockPositionRepository;
   @Autowired private StockPositionService stockPositionService;
   public static void main(String[] args) {
@@ -33,7 +37,8 @@ public class StockApplication implements CommandLineRunner {
 
   @Override
   public void run(String... args) throws Exception {
-
+    totalOperationYearRepository.deleteAll();
+    totalOperationMonthRepository.deleteAll();
     stockPositionRepository.deleteAll();
     operationService.reprocessStockPosition();
     totalOperationRepository.deleteAll();
