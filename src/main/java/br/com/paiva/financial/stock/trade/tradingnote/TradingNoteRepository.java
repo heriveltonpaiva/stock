@@ -6,4 +6,6 @@ public interface TradingNoteRepository extends MongoRepository<TradingNote, Stri
 
     TradingNote findByCode(final String code);
 
+    TradingNote findByDate(final String date);
+
 }

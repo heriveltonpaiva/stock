@@ -1,8 +1,10 @@
 package br.com.paiva.financial.stock.trade.tradingnote;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import javax.validation.Valid;
 import java.text.ParseException;
 import java.util.List;
 
@@ -14,8 +16,8 @@ public class TradingNoteController {
     private final TradingNoteService tradingNoteService;
 
     @RequestMapping(value = "/note", method = RequestMethod.POST)
-    public TradingNote createTradingNote(@RequestBody TradingNoteDTO tradingNote) throws ParseException {
-        return tradingNoteService.createTradingNote(tradingNote);
+    public ResponseEntity<TradingNote> createTradingNote(@Valid @RequestBody TradingNoteDTO tradingNote) throws ParseException {
+        return ResponseEntity.ok(tradingNoteService.createTradingNote(tradingNote));
     }
 
     @GetMapping(value = "/notes")

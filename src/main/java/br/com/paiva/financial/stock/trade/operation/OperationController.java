@@ -20,4 +20,5 @@ public class OperationController {
   public List<Operation> findAll() {
     return service.findAll();
   }
+
 }

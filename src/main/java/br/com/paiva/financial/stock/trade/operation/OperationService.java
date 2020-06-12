@@ -16,6 +16,7 @@ import org.springframework.stereotype.Component;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.ZoneId;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
@@ -67,10 +68,9 @@ public class OperationService {
   }
 
   public Operation create(OperationDTO dto){
-    TradingNote note = tradingNoteService.findByCode(dto.getTradingNoteCode());
+      TradingNote note = tradingNoteService.findByCode(dto.getTradingNoteCode());
+      validate(dto, note);
 
-    if (Objects.nonNull(note)) {
-      log.info("TradingNote code={} was found", note.getCode());
       Operation op = new Operation();
       op.setTradingNoteCode(note.getCode());
       op.setType(OperationType.valueOf(dto.getType()));
@@ -92,9 +92,30 @@ public class OperationService {
       updateStockPosition(op);
 
       return op;
+  }
+
+  private void validate(final OperationDTO operationDTO, final TradingNote note) {
+    List<String> errors = new ArrayList<>();
+
+    if (Objects.nonNull(note)) {
+      errors.add("Error: Trading note couldn't is not found.");
     }
-    log.error("Trading note i'snt exist!");
-    return null;
+    if (Objects.isNull(operationDTO.getStockName())) {
+      errors.add("Error: Stock name couldn't is not empty.");
+    }
+
+    if (Objects.isNull(operationDTO.getOperationPrice())) {
+      errors.add("Error: Operation price couldn't is not empty.");
+    }
+
+    if (Objects.isNull(operationDTO.getQuantity())) {
+      errors.add("Error: Operation price couldn't is not empty.");
+    }
+
+    if (Objects.nonNull(errors)) {
+      log.error(errors.toString());
+      throw new RuntimeException("Happened error when try validate operation creation.");
+    }
   }
 
   private void calculateOperationValues(final Operation op, final BrokerType brokerType){
@@ -123,7 +144,9 @@ public class OperationService {
       updateTotalOperation(op);
     });
     totalOperationService.reprocessTotalOperationMonth(totalOperationService.findAll());
+    log.info("Total operation month processed with success.");
     totalOperationService.reprocessTotalOperationYear(2020, totalOperationService.findAllMonth());
+    log.info("Total operation year processed with success.");
   }
 
   private void updateTotalOperation(Operation op) {
