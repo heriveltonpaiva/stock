@@ -9,7 +9,9 @@ import br.com.paiva.financial.stock.dashboard.totaloperation.month.TotalOperatio
 import br.com.paiva.financial.stock.dashboard.totaloperation.year.TotalOperationYearRepository;
 import br.com.paiva.financial.stock.trade.operation.Operation;
 import br.com.paiva.financial.stock.trade.operation.OperationRepository;
+import br.com.paiva.financial.stock.trade.operation.OperationRepositoryImpl;
 import br.com.paiva.financial.stock.trade.operation.OperationService;
+import br.com.paiva.financial.stock.trade.operation.request.OperationSearchRequest;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
@@ -30,6 +32,7 @@ public class StockApplication implements CommandLineRunner {
   @Autowired private TotalOperationYearRepository totalOperationYearRepository;
   @Autowired private StockPositionRepository stockPositionRepository;
   @Autowired private StockPositionService stockPositionService;
+  @Autowired private OperationRepositoryImpl operationRepository;
   public static void main(String[] args) {
 
     SpringApplication.run(StockApplication.class, args);
@@ -44,8 +47,10 @@ public class StockApplication implements CommandLineRunner {
     totalOperationRepository.deleteAll();
     operationService.reprocessTotalOperation();
     List<TotalOperation> totalOperations = totalOperationRepository.findAll();
-    for (TotalOperation operation : totalOperations) {
-      //System.out.println(operation);
+    OperationSearchRequest ob = new OperationSearchRequest();
+    ob.setReferenceMonth("3");
+    for (Operation operation : operationRepository.findByFilter(ob)) {
+      System.out.println(operation);
     }
   }
 }

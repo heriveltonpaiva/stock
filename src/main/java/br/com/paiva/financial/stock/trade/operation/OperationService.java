@@ -3,6 +3,7 @@ package br.com.paiva.financial.stock.trade.operation;
 import br.com.paiva.financial.stock.dashboard.stockposition.StockPosition;
 import br.com.paiva.financial.stock.dashboard.stockposition.StockPositionService;
 import br.com.paiva.financial.stock.dashboard.totaloperation.TotalOperationService;
+import br.com.paiva.financial.stock.trade.operation.request.OperationSearchRequest;
 import br.com.paiva.financial.stock.trade.tax.TaxService;
 import br.com.paiva.financial.stock.trade.tradingnote.BrokerType;
 import br.com.paiva.financial.stock.trade.tradingnote.TradingNote;
@@ -29,6 +30,8 @@ public class OperationService {
 
   private final OperationRepository repository;
 
+  private final OperationRepositoryImpl operationRepository;
+
   private final TaxService taxService;
 
   private final TradingNoteService tradingNoteService;
@@ -43,6 +46,10 @@ public class OperationService {
 
   public List<Operation> findAll() {
     return repository.findAll(Sort.by(Sort.Order.asc("tradingNoteCode")));
+  }
+
+  public List<Operation> findByFilter(final OperationSearchRequest searchRequest){
+    return operationRepository.findByFilter(searchRequest);
   }
 
   private Double getDarf(final Operation op) {
