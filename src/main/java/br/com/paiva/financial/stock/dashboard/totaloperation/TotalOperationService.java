@@ -1,5 +1,6 @@
 package br.com.paiva.financial.stock.dashboard.totaloperation;
 
+import br.com.paiva.financial.stock.dashboard.totaloperation.filtered.TotalOperationFiltered;
 import br.com.paiva.financial.stock.dashboard.totaloperation.month.TotalOperationMonth;
 import br.com.paiva.financial.stock.dashboard.totaloperation.month.TotalOperationMonthRepository;
 import br.com.paiva.financial.stock.dashboard.totaloperation.year.TotalOperationYear;
@@ -154,7 +155,8 @@ public class TotalOperationService {
           totalOperationBD.getTotalIncomingTax() + operation.getTaxes().getIncomingTax());
       Double totalDarf = totalOperationBD.getTotalDarf() + operation.getDarf();
       totalOperationBD.setTotalDarf(totalDarf < 0D ? 0D : totalDarf);
-      totalOperationBD.setTotalBrokerage(totalOperationBD.getTotalBrokerage() + operation.getTaxes().getBrokerage());
+      totalOperationBD.setTotalBrokerage(
+          totalOperationBD.getTotalBrokerage() + operation.getTaxes().getBrokerage());
       totalOperationBD.setTotalOtherTaxes(
           totalOperationBD.getTotalOtherTaxes() + operation.getTaxes().getOtherTaxes());
       totalOperationBD.setTotalTaxes(
@@ -189,5 +191,36 @@ public class TotalOperationService {
     totalOperation.setTotalOperationalCosts(operation.getTaxes().getOperationalCosts());
     totalOperation.setLastModified(LocalDate.now());
     return repository.save(totalOperation);
+  }
+
+  public void calculateTotalOperationFiltered(
+      TotalOperationFiltered totalOperation, Operation operation) {
+    if (operation.getType() == OperationType.BUY) {
+      totalOperation.setBuyQuantity(totalOperation.getBuyQuantity() + operation.getQuantity());
+      totalOperation.setTotalPurchased(
+          totalOperation.getTotalPurchased() + operation.getOperationPrice());
+
+    } else {
+      totalOperation.setSellQuantity(totalOperation.getSellQuantity() + operation.getQuantity());
+      totalOperation.setTotalSold(totalOperation.getTotalSold() + operation.getOperationPrice());
+    }
+
+    totalOperation.setTotalEmoluments(
+        totalOperation.getTotalEmoluments() + operation.getTaxes().getEmoluments());
+    totalOperation.setTotalGainValue(totalOperation.getTotalGainValue() + operation.getGainValue());
+    totalOperation.setTotalLiquidation(
+        totalOperation.getTotalLiquidation() + operation.getTaxes().getLiquidation());
+
+    totalOperation.setTotalIncomingTax(
+        totalOperation.getTotalIncomingTax() + operation.getTaxes().getIncomingTax());
+    Double totalDarf = totalOperation.getTotalDarf() + operation.getDarf();
+    totalOperation.setTotalDarf(totalDarf < 0D ? 0D : totalDarf);
+    totalOperation.setTotalBrokerage(
+        totalOperation.getTotalBrokerage() + operation.getTaxes().getBrokerage());
+    totalOperation.setTotalOtherTaxes(
+        totalOperation.getTotalOtherTaxes() + operation.getTaxes().getOtherTaxes());
+    totalOperation.setTotalTaxes(totalOperation.getTotalTaxes() + operation.getTaxes().getTaxes());
+    totalOperation.setTotalOperationalCosts(
+        totalOperation.getTotalOperationalCosts() + operation.getTaxes().getOperationalCosts());
   }
 }

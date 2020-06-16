@@ -35,7 +35,7 @@ public class TaxService {
     tax.setTaxes(round(getToY(note.getValue(), note.getTaxes().getTaxes(), operationValue)));
     tax.setIncomingTax(type == OperationType.SELL ? round(getToY(note.getValueSell(), note.getTaxes().getIncomingTax(), operationValue)) : 0D);
     tax.setOtherTaxes(round(getToY(note.getValue(), note.getTaxes().getOtherTaxes(), operationValue)));
-    tax.setBrokerage(note.getBroker().equals(BrokerType.XP)? 18.9 : 0);
+    tax.setBrokerage(note.getBroker().equals(BrokerType.XP)? 18.9 : 0D);
     return tax;
   }
 

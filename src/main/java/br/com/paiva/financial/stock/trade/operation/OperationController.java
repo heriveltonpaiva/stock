@@ -1,10 +1,9 @@
 package br.com.paiva.financial.stock.trade.operation;
 
 import br.com.paiva.financial.stock.trade.operation.request.OperationSearchRequest;
+import br.com.paiva.financial.stock.trade.operation.response.OperationResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.List;
 
 @CrossOrigin("*")
 @RequiredArgsConstructor
@@ -19,7 +18,7 @@ public class OperationController {
   }
 
   @RequestMapping(value = "/operations", method = RequestMethod.GET)
-  public List<Operation> findByFilter(
+  public OperationResponse findByFilter(
       @RequestParam(name = "broker", required = false) final String broker,
       @RequestParam(name = "referenceMonth", required = false) final String referenceMonth,
       @RequestParam(name = "stockName", required = false) final String stockName,

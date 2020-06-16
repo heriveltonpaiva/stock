@@ -13,7 +13,6 @@ import org.springframework.util.ObjectUtils;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
-import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Slf4j
@@ -37,8 +36,10 @@ public class StockPositionService {
       if(stocks != null){
         stocks = stocks.stream().filter(s -> s.getBroker().equals(brokerType)).collect(Collectors.toList());
       }
+
       StockPosition stockDay =
           repository.findByDateAndStockNameAndBrokerOrderByLastModifiedDesc(noteDate, op.getStockName(), brokerType);
+
 
       StockPosition lastStockPosition =
           stocks.stream()

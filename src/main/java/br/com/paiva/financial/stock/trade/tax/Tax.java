@@ -16,8 +16,7 @@ import static br.com.paiva.financial.stock.util.StockUtils.round;
 @NoArgsConstructor
 @AllArgsConstructor
 public class Tax {
-  @Id
-  private String id;
+  @Id private String id;
   private Double emoluments;
   private Double liquidation;
   private Double brokerage;
@@ -28,21 +27,35 @@ public class Tax {
   private Double operationalCosts;
 
   public Tax(final TradingNote note, final Double operationValue, final OperationType type) {
-    this.emoluments = round(getToY(note.getValue(), note.getTaxes().getEmoluments(), operationValue));
-    this.liquidation = round(getToY(note.getValue(), note.getTaxes().getLiquidation(), operationValue));
+    this.emoluments =
+        round(getToY(note.getValue(), note.getTaxes().getEmoluments(), operationValue));
+    this.liquidation =
+        round(getToY(note.getValue(), note.getTaxes().getLiquidation(), operationValue));
     this.taxes = round(getToY(note.getValue(), note.getTaxes().getTaxes(), operationValue));
-    this.incomingTax = type == OperationType.SELL ? round(getToY(note.getValueSell(), note.getTaxes().getIncomingTax(), operationValue)) : 0D;
-    this.otherTaxes = round(getToY(note.getValue(), note.getTaxes().getOtherTaxes(), operationValue));
+    this.incomingTax =
+        type == OperationType.SELL
+            ? round(getToY(note.getValueSell(), note.getTaxes().getIncomingTax(), operationValue))
+            : 0D;
+    this.otherTaxes =
+        round(getToY(note.getValue(), note.getTaxes().getOtherTaxes(), operationValue));
   }
 
-  public Double getTotalValue(){
-    return round(emoluments + liquidation + brokerage + taxes + otherTaxes + incomingTax);
+  public Double getTotalValue() {
+    return round(
+        emoluments
+            + liquidation
+            + (brokerage == null ? 0D : brokerage)
+            + (taxes == null ? 0D : taxes)
+            + (otherTaxes == null ? 0D : otherTaxes)
+            + (incomingTax == null ? 0D : incomingTax));
   }
 
-  public Double getOperationalCosts(){
-    return round(brokerage + taxes + otherTaxes);
+  public Double getOperationalCosts() {
+    return round(
+        (brokerage == null ? 0D : brokerage)
+            + (taxes == null ? 0D : taxes)
+            + (otherTaxes == null ? 0D : otherTaxes));
   }
-
 
   @Override
   public String toString() {

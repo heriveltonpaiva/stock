@@ -34,7 +34,7 @@ public class TradingNoteService {
 
   private TradingNote createNewTradingNote(TradingNoteDTO tradingNoteDTO) throws ParseException {
 
-    validate(tradingNoteDTO);
+    //validate(tradingNoteDTO);
 
     TradingNote note = new TradingNote();
     note.setCode(tradingNoteDTO.getCode());
@@ -85,7 +85,7 @@ public class TradingNoteService {
     }
 
     if (Objects.nonNull(tradingNoteDTO.getOperationSell())
-        && Objects.nonNull(tradingNoteDTO.getTaxes().getIncomingTax())) {
+        && Objects.isNull(tradingNoteDTO.getTaxes().getIncomingTax())) {
       errors.add("Error: Incoming Tax couldn't R$ 0,00 for sell operation.");
     }
 

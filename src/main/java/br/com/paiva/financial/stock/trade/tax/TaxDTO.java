@@ -9,17 +9,23 @@ import javax.validation.constraints.NotNull;
 
 @Data
 @Builder
-@NoArgsConstructor
 @AllArgsConstructor
 public class TaxDTO {
 
-  @NotNull(message = "emoluments is null")
   private Double emoluments;
-  @NotNull(message = "liquidation is null")
   private Double liquidation;
   private Double brokerage;
   private Double taxes;
   private Double incomingTax;
   private Double otherTaxes;
+
+  public TaxDTO(){
+    this.liquidation = 0D;
+    this.emoluments = 0D;
+    this.brokerage = 0D;
+    this.incomingTax = 0D;
+    this.otherTaxes = 0D;
+    this.taxes = 0D;
+  }
 
 }
