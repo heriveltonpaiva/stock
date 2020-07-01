@@ -3,6 +3,7 @@ package br.com.paiva.financial.stock.trade.tradingnote;
 import br.com.paiva.financial.stock.trade.tax.TaxService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Component;
 
 import java.text.ParseException;
@@ -25,7 +26,7 @@ public class TradingNoteService {
   }
 
   public List<TradingNote> findAll() {
-    return repository.findAll();
+    return repository.findAll(Sort.by(Sort.Order.desc("date")));
   }
 
   public TradingNote findByCode(final String code) {

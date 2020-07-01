@@ -33,9 +33,6 @@ public class Operation {
 
   public Double getDarf(){
     if(type.equals(OperationType.SELL)){
-      if(getGainValue() < 0D){
-        return 0D;
-      }
       return round(getGainValue() * SWING_TRADE_TAX);
     }
     return 0D;

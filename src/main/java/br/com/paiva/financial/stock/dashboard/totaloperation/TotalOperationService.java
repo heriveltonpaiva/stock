@@ -214,7 +214,7 @@ public class TotalOperationService {
     totalOperation.setTotalIncomingTax(
         totalOperation.getTotalIncomingTax() + operation.getTaxes().getIncomingTax());
     Double totalDarf = totalOperation.getTotalDarf() + operation.getDarf();
-    totalOperation.setTotalDarf(totalDarf < 0D ? 0D : totalDarf);
+    totalOperation.setTotalDarf(totalDarf);
     totalOperation.setTotalBrokerage(
         totalOperation.getTotalBrokerage() + operation.getTaxes().getBrokerage());
     totalOperation.setTotalOtherTaxes(
